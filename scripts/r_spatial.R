@@ -81,7 +81,7 @@ xlimits<-c(550000,900000)
 ylimits<-c(9600000,9950000)
 
 # plot the woody biomass map that you want to predict
-ggplot()+
+woody_map<-ggplot()+
   tidyterra::geom_spatraster(data=woodybiom)+
   scale_fill_gradientn(colours=rev(terrain.colors(6)),
                        limits=c(0.77,6.55),
@@ -90,20 +90,66 @@ ggplot()+
   tidyterra::geom_spatvector(data=protected_areas,
                              fill=NA, linewidth=0.7,colour="green")+
 #add study area, rivers and lakes. STudy area in red,not filled. lake=light blue. rivers=blue.
-tidyterra::geom_spatvector(data=studyarea,fill=NA,colour="red",linewidth=1)+
+tidyterra::geom_spatvector(data=studyarea,
+                           fill=NA,colour="red",linewidth=1)+
 tidyterra::geom_spatvector(data=rivers,colour="blue")+
-  tidyterra::geom_spatvector(data=lakes,fill="lightblue")
+  tidyterra::geom_spatvector(data=lakes,fill="lightblue")+
+  labs(title="Woody biomass")+
+  coord_sf(xlimits,ylimits,datum=sf::st_crs(32736))+
+  theme(axis.rext = element_blank(),
+        axis.ticks = element_blank())+
+  ggspatial::annotation_scale(location="bl",width_hint=0.2)
 
+woody_map
 
+# plot the rainfall map##########################################################################
+rainfall_map<-ggplot()+
+  tidyterra::geom_spatraster(data=rainfall)+
+  scale_fill_gradientn(colours=rev(pal_zissou1),
+                       limits=c(625,1375),
+                       oob=squish,#means that values outside the limits are set to the colour of the limits.
+                       name="mm/year")+
+  tidyterra::geom_spatvector(data=protected_areas,
+                             fill=NA, linewidth=0.7,colour="green")+
+  tidyterra::geom_spatvector(data=studyarea,
+                             fill=NA,colour="red",linewidth=1)+
+  tidyterra::geom_spatvector(data=rivers,colour="blue")+
+  tidyterra::geom_spatvector(data=lakes,fill="lightblue")+
+  labs(title="Annual rainfall")+
+  coord_sf(xlimits,ylimits,datum=sf::st_crs(32736))+
+  theme(axis.rext = element_blank(),
+        axis.ticks = element_blank())+
+  ggspatial::annotation_scale(location="bl",width_hint=0.2)
 
+rainfall_map
 
-# plot the rainfall map
+# plot the elevation map##########################################################################
+elevation_map<-ggplot()+
+  tidyterra::geom_spatraster(data=elevation)+
+  scale_fill_gradientn(colours=terrain.colors(10),
+                       limits=c(500,2000),
+                       oob=squish,#means that values outside the limits are set to the colour of the limits.
+                       name="meters")+
+  tidyterra::geom_spatvector(data=protected_areas,
+                             fill=NA, linewidth=0.7,colour="green")+
+  #add study area, rivers and lakes. STudy area in red,not filled. lake=light blue. rivers=blue.
+  tidyterra::geom_spatvector(data=studyarea,
+                             fill=NA,colour="red",linewidth=1)+
+  tidyterra::geom_spatvector(data=rivers,colour="blue")+
+  tidyterra::geom_spatvector(data=lakes,fill="lightblue")+
+  labs(title="Elevation map")+
+  coord_sf(xlimits,ylimits,datum=sf::st_crs(32736))+
+  theme(axis.rext = element_blank(),
+        axis.ticks = element_blank())+
+  ggspatial::annotation_scale(location="bl",width_hint=0.2)
 
-# plot the elevation map
+elevation_map
 
 # combine the different maps  into one composite map using the patchwork library
 # and save it to a high resolution png
 
+
+woody_map + elevation_map
 
 ############################
 ### explore your study area
