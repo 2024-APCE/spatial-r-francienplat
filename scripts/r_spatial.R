@@ -29,15 +29,15 @@ barplot(rep(1,10), col = grey.colors(10))
 mycolors<-c("red", "white", "blue")
 mycolors
 
-barplot(rep(1,10), col = rev(topo.colors(10))) # rev turns the scale arround
-barplot(rep(1,10), col = rev(terrain.colors(10)))
+barplot(rep(1,10), col = rev(topo.colors(10))) # rev turns the scale around, so you can change the order of the colors.
+barplot(rep(1,10), col = rev(terrain.colors(10)))#topo colors and terrain colors are build in to use. 
 library(RColorBrewer) 
-RColorBrewer::display.brewer.all()
+RColorBrewer::display.brewer.all()#colour pallettes that you can use.
 barplot(rep(1,10), col = RColorBrewer::brewer.pal(10, "Spectral"))
 
 barplot(rep(1,10), col = RColorBrewer::brewer.pal(10, "BrBG"))
-library(viridis)
-barplot(rep(1,10), col = viridis::viridis(10))
+library(viridis) #another package with colour pallettes
+barplot(rep(1,10), col = rev(viridis::viridis(10)))
 barplot(rep(1,10), col = viridis::plasma(10))
 barplot(rep(1,10), col = viridis::heat(10))
 viridis::plasma(10)
@@ -48,9 +48,10 @@ pal_zissou2<-wesanderson::wes_palette("Zissou1", 10, type = "continuous")
 pal_zissou1
 
 # load the vector data for the whole ecosystem
-sf::st_layers("./2022_protected_areas/protected_areas.gpkg")
+sf::st_layers("./2022_protected_areas/protected_areas.gpkg")#. is to use working directory that you set earlier.
 protected_areas<-terra::vect("./2022_protected_areas/protected_areas.gpkg",
             layer="protected_areas_2022") # read protected area boundaries)
+
 sf::st_layers("./2022_rivers/rivers_hydrosheds.gpkg")
 rivers<-terra::vect("./2022_rivers/rivers_hydrosheds.gpkg",
                     layer="rivers_hydrosheds")
@@ -69,14 +70,32 @@ rainfall<-terra::rast("./rainfall/CHIRPS_MeanAnnualRainfall.tif")
 elevation<-terra::rast("./2023_elevation/elevation_90m.tif")
 
 # inspect the data 
-class(protected_areas)
-
+class(protected_areas)#spat is best option
+plot(protected_areas)
+plot(rivers)
+plot(lakes)
+plot(elevation,add=T)
 
 # set the limits of the map to show (xmin, xmax, ymin, ymax in utm36 coordinates)
 xlimits<-c(550000,900000)
 ylimits<-c(9600000,9950000)
 
 # plot the woody biomass map that you want to predict
+ggplot()+
+  tidyterra::geom_spatraster(data=woodybiom)+
+  scale_fill_gradientn(colours=rev(terrain.colors(6)),
+                       limits=c(0.77,6.55),
+                       oob=squish,#means that values outside the limits are set to the colour of the limits.
+                       name="TBA/ha")+
+  tidyterra::geom_spatvector(data=protected_areas,
+                             fill=NA, linewidth=0.7,colour="green")+
+#add study area, rivers and lakes. STudy area in red,not filled. lake=light blue. rivers=blue.
+tidyterra::geom_spatvector(data=studyarea,fill=NA,colour="red",linewidth=1)+
+tidyterra::geom_spatvector(data=rivers,colour="blue")+
+  tidyterra::geom_spatvector(data=lakes,fill="lightblue")
+
+
+
 
 # plot the rainfall map
 
