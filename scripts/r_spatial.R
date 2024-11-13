@@ -96,7 +96,7 @@ tidyterra::geom_spatvector(data=rivers,colour="blue")+
   tidyterra::geom_spatvector(data=lakes,fill="lightblue")+
   labs(title="Woody biomass")+
   coord_sf(xlimits,ylimits,datum=sf::st_crs(32736))+
-  theme(axis.rext = element_blank(),
+  theme(axis.text = element_blank(),
         axis.ticks = element_blank())+
   ggspatial::annotation_scale(location="bl",width_hint=0.2)
 
@@ -117,7 +117,7 @@ rainfall_map<-ggplot()+
   tidyterra::geom_spatvector(data=lakes,fill="lightblue")+
   labs(title="Annual rainfall")+
   coord_sf(xlimits,ylimits,datum=sf::st_crs(32736))+
-  theme(axis.rext = element_blank(),
+  theme(axis.text = element_blank(),
         axis.ticks = element_blank())+
   ggspatial::annotation_scale(location="bl",width_hint=0.2)
 
@@ -139,7 +139,7 @@ elevation_map<-ggplot()+
   tidyterra::geom_spatvector(data=lakes,fill="lightblue")+
   labs(title="Elevation map")+
   coord_sf(xlimits,ylimits,datum=sf::st_crs(32736))+
-  theme(axis.rext = element_blank(),
+  theme(axis.text = element_blank(),
         axis.ticks = element_blank())+
   ggspatial::annotation_scale(location="bl",width_hint=0.2)
 
@@ -148,8 +148,13 @@ elevation_map
 # combine the different maps  into one composite map using the patchwork library
 # and save it to a high resolution png
 
+allmaps<-woody_map+elevation_map+rainfall_map+
+  patchwork::plot_layout(ncol=1)
+allmaps
+#ggsave("./figures/allmaps.png",allmaps,width=18,height=18,units="cm",dpi=300)
 
-woody_map + elevation_map
+
+
 
 ############################
 ### explore your study area
@@ -157,14 +162,93 @@ woody_map + elevation_map
 xlimits<-sf::st_bbox(studyarea)[c(1,3)]
 ylimits<-sf::st_bbox(studyarea)[c(2,4)]
 saExt<-terra::ext(studyarea)
-
+saExt
 # crop the woody biomass to the extent of the studyarea
-
+woodybiom_sa<-terra::crop(woodybiom,saExt)
 
 # plot the woody biomass
+woody_map_sa<-ggplot()+
+  tidyterra::geom_spatraster(data=woodybiom_sa)+
+  scale_fill_gradientn(colours=rev(terrain.colors(6)),
+                       limits=c(0.77,6.55),
+                       oob=squish,#means that values outside the limits are set to the colour of the limits.
+                       name="TBA/ha")+
+  tidyterra::geom_spatvector(data=protected_areas,
+                             fill=NA, linewidth=0.7,colour="green")+
+  #add study area, rivers and lakes. STudy area in red,not filled. lake=light blue. rivers=blue.
+  tidyterra::geom_spatvector(data=studyarea,
+                             fill=NA,colour="red",linewidth=1)+
+  tidyterra::geom_spatvector(data=rivers,colour="blue")+
+  tidyterra::geom_spatvector(data=lakes,fill="lightblue")+
+  labs(title="Woody biomass")+
+  coord_sf(xlimits,ylimits, expand=F,datum=sf::st_crs(32736))+
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank())+
+  ggspatial::annotation_scale(location="bl",width_hint=0.2)
 
+woody_map_sa
 
 # make maps also for the other layers that you found
+
+
+#distance to river####################################################################################
+dist_river_20_sa<-terra::rast("C:/Users/franc/Documents/Master/APCE2024/QGIS/apce2024gis/2022_rivers/DistanceToRiver20.tif")
+
+dist_river_20_sa_map<-ggplot()+
+  tidyterra::geom_spatraster(data=dist_river_20_sa/200)+
+  scale_fill_gradientn(colours=rev(terrain.colors(6)),
+                       limits=c(0.77,6.55),
+                       oob=squish,#means that values outside the limits are set to the colour of the limits.
+                       name="TBA/ha")+
+  tidyterra::geom_spatvector(data=protected_areas,
+                             fill=NA, linewidth=0.7,colour="green")+
+  #add study area, rivers and lakes. STudy area in red,not filled. lake=light blue. rivers=blue.
+  tidyterra::geom_spatvector(data=studyarea,
+                             fill=NA,colour="red",linewidth=1)+
+  tidyterra::geom_spatvector(data=rivers,colour="blue")+
+  tidyterra::geom_spatvector(data=lakes,fill="lightblue")+
+  labs(title="Distance to River")+
+  coord_sf(xlimits,ylimits, expand=F,datum=sf::st_crs(32736))+
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank())+
+  ggspatial::annotation_scale(location="bl",width_hint=0.2)
+
+dist_river_20_sa_map
+
+#soilfertility
+soil_fertility_sa<-terra::rast("C:/Users/franc/Documents/Master/APCE2024/QGIS/apce2024gis/SoilFertilityCEC_5_15cm.tif")
+
+
+soil_fertility_sa_map<-ggplot()+
+  tidyterra::geom_spatraster(data=soil_fertility_sa)+
+  scale_fill_gradientn(colours=rev(terrain.colors(6)),
+                       limits=c(0.77,6.55),
+                       oob=squish,#means that values outside the limits are set to the colour of the limits.
+                       name="TBA/ha")+
+  tidyterra::geom_spatvector(data=protected_areas,
+                             fill=NA, linewidth=0.7,colour="green")+
+  #add study area, rivers and lakes. STudy area in red,not filled. lake=light blue. rivers=blue.
+  tidyterra::geom_spatvector(data=studyarea,
+                             fill=NA,colour="red",linewidth=1)+
+  tidyterra::geom_spatvector(data=rivers,colour="blue")+
+  tidyterra::geom_spatvector(data=lakes,fill="lightblue")+
+  labs(title="Woody biomass")+
+  coord_sf(xlimits,ylimits, expand=F,datum=sf::st_crs(32736))+
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank())+
+  ggspatial::annotation_scale(location="bl",width_hint=0.2)
+
+
+
+
+
+
+
+
+
+
+
+
 
 # create 500 random points in our study area
 
