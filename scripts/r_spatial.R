@@ -3,7 +3,9 @@
 
 rm(list = ls())
 # set the working directory where your GIS data are located
-setwd("G:/Shared drives/_Org OlffLab/Teaching/APCE/APCE2024/APCE2024GIS")
+#setwd("G:/Shared drives/_Org OlffLab/Teaching/APCE/APCE2024/APCE2024GIS")
+#to do this, go to verkenner/explorer and copy the directory. Change slashes to forward slashes.
+setwd("C:/Users/franc/Documents/Master/APCE2024/QGIS/apce2024gis")
 
 # restore the libraries of the project 
 renv::restore()
@@ -23,6 +25,10 @@ library(patchwork)  # for combining multiple ggplots in one panel plot
 # also see https://www.datanovia.com/en/blog/top-r-color-palettes-to-know-for-great-data-visualization/
 # Base R palettes
 barplot(rep(1,10), col = grey.colors(10))
+
+mycolors<-c("red", "white", "blue")
+mycolors
+
 barplot(rep(1,10), col = rev(topo.colors(10))) # rev turns the scale arround
 barplot(rep(1,10), col = rev(terrain.colors(10)))
 library(RColorBrewer) 
