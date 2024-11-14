@@ -222,9 +222,9 @@ soil_fertility_sa<-terra::rast("C:/Users/franc/Documents/Master/APCE2024/QGIS/ap
 soil_fertility_sa_map<-ggplot()+
   tidyterra::geom_spatraster(data=soil_fertility_sa)+
   scale_fill_gradientn(colours=rev(terrain.colors(6)),
-                       limits=c(0.77,6.55),
+                       limits=c(121,301),
                        oob=squish,#means that values outside the limits are set to the colour of the limits.
-                       name="TBA/ha")+
+                       name="*Soil Fertility measure")+
   tidyterra::geom_spatvector(data=protected_areas,
                              fill=NA, linewidth=0.7,colour="green")+
   #add study area, rivers and lakes. STudy area in red,not filled. lake=light blue. rivers=blue.
@@ -232,13 +232,80 @@ soil_fertility_sa_map<-ggplot()+
                              fill=NA,colour="red",linewidth=1)+
   tidyterra::geom_spatvector(data=rivers,colour="blue")+
   tidyterra::geom_spatvector(data=lakes,fill="lightblue")+
-  labs(title="Woody biomass")+
+  labs(title="Soil fertility")+
   coord_sf(xlimits,ylimits, expand=F,datum=sf::st_crs(32736))+
   theme(axis.text = element_blank(),
         axis.ticks = element_blank())+
   ggspatial::annotation_scale(location="bl",width_hint=0.2)
 
+soil_fertility_sa_map
 
+#elevation
+elevation_sa<-terra::rast("C:/Users/franc/Documents/Master/APCE2024/QGIS/apce2024gis/2023_elevation/elevation_90m.tif")
+
+elevation_sa_map<-ggplot()+
+  tidyterra::geom_spatraster(data=elevation_sa)+
+  scale_fill_gradientn(colours=rev(terrain.colors(6)),
+                       limits=c(700,2300),
+                       oob=squish,#means that values outside the limits are set to the colour of the limits.
+                       name="*meters")+
+  tidyterra::geom_spatvector(data=protected_areas,
+                             fill=NA, linewidth=0.7,colour="green")+
+  tidyterra::geom_spatvector(data=studyarea,
+                             fill=NA,colour="red",linewidth=1)+
+  tidyterra::geom_spatvector(data=rivers,colour="blue")+
+  tidyterra::geom_spatvector(data=lakes,fill="lightblue")+
+  labs(title="Elevation")+
+  coord_sf(xlimits,ylimits, expand=F,datum=sf::st_crs(32736))+
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank())+
+  ggspatial::annotation_scale(location="bl",width_hint=0.2)
+
+elevation_sa_map
+
+#rainfall
+rainfall_sa<-terra::rast("C:/Users/franc/Documents/Master/APCE2024/QGIS/apce2024gis/rainfall/CHIRPS_MeanAnnualRainfall.tif")
+
+rainfall_sa_map<-ggplot()+
+  tidyterra::geom_spatraster(data=rainfall_sa)+
+  scale_fill_gradientn(colours=rev(terrain.colors(6)),
+                       limits=c(675,1325),
+                       oob=squish,#means that values outside the limits are set to the colour of the limits.
+                       name="*mm/year")+
+  tidyterra::geom_spatvector(data=protected_areas,
+                             fill=NA, linewidth=0.7,colour="green")+
+  tidyterra::geom_spatvector(data=studyarea,
+                             fill=NA,colour="red",linewidth=1)+
+  tidyterra::geom_spatvector(data=rivers,colour="blue")+
+  tidyterra::geom_spatvector(data=lakes,fill="lightblue")+
+  labs(title="Mean annual rainfall")+
+  coord_sf(xlimits,ylimits, expand=F,datum=sf::st_crs(32736))+
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank())+
+  ggspatial::annotation_scale(location="bl",width_hint=0.2)
+
+rainfall_sa_map
+
+#EVI Trend  SOMETHING WRONG IN QGIS
+#EVI_trend_sa<-terra::rast("C:/Users/franc/Documents/Master/APCE2024/QGIS/apce2024gis/EVI_trend/EVI_trend.tif")
+
+#EVI_trend_sa_map<-ggplot()+
+ # tidyterra::geom_spatraster(data=EVI_trend_sa)+
+  #scale_fill_gradientn(colours=rev(terrain.colors(6)),
+  #                     limits=c(-0.1,0.1),
+         #              oob=squish,#means that values outside the limits are set to the colour of the limits.
+   #                    name="*EVI trend")+
+#  tidyterra::geom_spatvector(data=protected_areas,
+   #                          fill=NA, linewidth=0.7,colour="green")+
+  #tidyterra::geom_spatvector(data=studyarea,
+                 #            fill=NA,colour="red",linewidth=1)+
+  #tidyterra::geom_spatvector(data=rivers,colour="blue")+
+  #tidyterra::geom_spatvector(data=lakes,fill="lightblue")+
+  labs(title="EVI trend")+
+  coord_sf(xlimits,ylimits, expand=F,datum=sf::st_crs(32736))+
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank())+
+  ggspatial::annotation_scale(location="bl",width_hint=0.2)
 
 
 
