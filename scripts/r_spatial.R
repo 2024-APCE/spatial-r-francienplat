@@ -123,6 +123,39 @@ rainfall_map<-ggplot()+
 
 rainfall_map
 
+#resolution is 200 meter, sometimes this can lead to bare spots without data in a rasterpoint.
+#then you can set a new resolution and resample and crop it:see script HO:
+
+# plot rainfall map for the study area
+# first you need to increase the raster resolution to 30 m
+# Define the extent and resolution for the new raster
+rainfall_30m <- rast(terra::ext(rainfall), resolution = 30, crs = crs(rainfall))
+# Resample the raster to 30m resolution
+rainfall_30m <- terra::resample(rainfall, rainfall_30m, method = "bilinear")  
+rainfall_sa<-terra::crop(rainfall_30m,saExt) # crop to study area
+rainfall_map_30_sa<-ggplot() +
+  tidyterra::geom_spatraster(data=rainfall_sa) +
+  scale_fill_gradientn(colours=pal_zissou1,
+                       limits=c(600,1000),
+                       oob=squish,
+                       name="mm/yr") +
+  tidyterra::geom_spatvector(data=protected_areas,
+                             fill=NA,linewidth=0.5) +
+  tidyterra::geom_spatvector(data=studyarea,
+                             fill=NA,linewidth=0.5,col="red") +
+  tidyterra::geom_spatvector(data=lakes,
+                             fill="lightblue",linewidth=0.5) +
+  tidyterra::geom_spatvector(data=rivers,
+                             col="blue",linewidth=0.5) +
+  labs(title="Rainfall") +
+  coord_sf(xlimits,ylimits,expand=F,
+           datum = sf::st_crs(32736)) +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank()) +
+  ggspatial::annotation_scale(location="bl",width_hint=0.2)
+rainfall_map_30_sa  
+
+
 # plot the elevation map##########################################################################
 elevation_map<-ggplot()+
   tidyterra::geom_spatraster(data=elevation)+
@@ -285,6 +318,20 @@ rainfall_sa_map<-ggplot()+
   ggspatial::annotation_scale(location="bl",width_hint=0.2)
 
 rainfall_sa_map
+
+allmaps_sa<-woody_map_sa+elevation_sa_map+rainfall_sa_map+soil_fertility_sa_map+dist_river_20_sa+
+  patchwork::plot_layout(ncol=3)
+
+allmaps_sa
+
+ggsave("./figures/allmaps.png",allmaps,width=18,height=18,units="cm",dpi=300)
+
+
+
+
+
+
+
 
 #EVI Trend  SOMETHING WRONG IN QGIS
 #EVI_trend_sa<-terra::rast("C:/Users/franc/Documents/Master/APCE2024/QGIS/apce2024gis/EVI_trend/EVI_trend.tif")
