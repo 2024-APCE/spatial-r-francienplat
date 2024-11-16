@@ -41,6 +41,7 @@ barplot(rep(1,10), col = rev(viridis::viridis(10)))
 barplot(rep(1,10), col = viridis::plasma(10))
 barplot(rep(1,10), col = viridis::heat(10))
 viridis::plasma(10)
+
 library(wesanderson)
 barplot(rep(1,10), col = rev(wesanderson::wes_palette("Zissou1", 10, type = "continuous")))
 pal_zissou1<-rev(wesanderson::wes_palette("Zissou1", 10, type = "continuous"))
@@ -147,13 +148,14 @@ elevation_map<-ggplot()+
 
 elevation_map
 
+
 # combine the different maps  into one composite map using the patchwork library
 # and save it to a high resolution png
 
-allmaps<-woody_map+elevation_map+rainfall_map+
-  patchwork::plot_layout(ncol=1)
+allmaps<-woody_map+elevation_map+
+  patchwork::plot_layout(ncol=2)
 allmaps
-#ggsave("./figures/allmaps.png",allmaps,width=18,height=18,units="cm",dpi=300)
+ggsave("./figures/allmaps2.png",allmaps,width=18,height=18,units="cm",dpi=300)
 
 
 
@@ -165,6 +167,7 @@ xlimits<-sf::st_bbox(studyarea)[c(1,3)]
 ylimits<-sf::st_bbox(studyarea)[c(2,4)]
 saExt<-terra::ext(studyarea)
 saExt
+
 # crop the woody biomass to the extent of the studyarea
 woodybiom_sa<-terra::crop(woodybiom,saExt)
 
@@ -190,8 +193,18 @@ woody_map_sa<-ggplot()+
 
 woody_map_sa
 
-# make maps also for the other layers that you found
-
+#plot only rivers in study area
+rivers_map_sa<-ggplot()+
+  tidyterra::geom_spatvector(data=rivers)+
+  tidyterra::geom_spatvector(data=studyarea,
+                             fill=NA,colour="red",linewidth=1)+
+  tidyterra::geom_spatvector(data=lakes,fill="lightblue")+
+  labs(title="Rivers")+
+  coord_sf(xlimits,ylimits, expand=F,datum=sf::st_crs(32736))+
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank())+
+  ggspatial::annotation_scale(location="bl",width_hint=0.2)
+rivers_map_sa
 
 #distance to river####################################################################################
 dist_river_20_sa<-terra::rast("C:/Users/franc/Documents/Master/APCE2024/QGIS/apce2024gis/2022_rivers/DistanceToRiver20.tif")
@@ -200,7 +213,7 @@ dist_river_20_sa_map<-ggplot()+
   tidyterra::geom_spatraster(data=dist_river_20_sa/200)+
   scale_fill_gradientn(colours=rev(terrain.colors(6)),
                        limits=c(0.77,6.55),
-                       oob=squish,#means that values outside the limits are set to the colour of the limits.
+                       oob=squish,
                        name="TBA/ha")+
   tidyterra::geom_spatvector(data=protected_areas,
                              fill=NA, linewidth=0.7,colour="green")+
@@ -216,6 +229,30 @@ dist_river_20_sa_map<-ggplot()+
   ggspatial::annotation_scale(location="bl",width_hint=0.2)
 
 dist_river_20_sa_map
+
+#distancetoriver 170
+dist_river_170_sa<-terra::rast("C:/Users/franc/Documents/Master/APCE2024/QGIS/apce2024gis/2022_rivers/DistanceToRiver170.tif")
+
+dist_river_170_sa_map<-ggplot()+
+  tidyterra::geom_spatraster(data=dist_river_170_sa)+
+  scale_fill_gradientn(colours=rev(terrain.colors(6)),
+                       limits=c(0,15000),
+                       oob=squish,#means that values outside the limits are set to the colour of the limits.
+                       name="meters")+
+  tidyterra::geom_spatvector(data=protected_areas,
+                             fill=NA, linewidth=0.7,colour="green")+
+  #add study area, rivers and lakes. STudy area in red,not filled. lake=light blue. rivers=blue.
+  tidyterra::geom_spatvector(data=studyarea,
+                             fill=NA,colour="red",linewidth=1)+
+  tidyterra::geom_spatvector(data=rivers,colour="blue")+
+  tidyterra::geom_spatvector(data=lakes,fill="lightblue")+
+  labs(title="Distance to river")+
+  coord_sf(xlimits,ylimits, expand=F,datum=sf::st_crs(32736))+
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank())+
+  ggspatial::annotation_scale(location="bl",width_hint=0.2)
+
+dist_river_170_sa_map
 
 #soilfertility
 soil_fertility_sa<-terra::rast("C:/Users/franc/Documents/Master/APCE2024/QGIS/apce2024gis/SoilFertilityCEC_5_15cm.tif")
@@ -243,12 +280,14 @@ soil_fertility_sa_map<-ggplot()+
 soil_fertility_sa_map
 
 #elevation
+minmax_values <- terra::minmax(rainfall_sa)
+print(minmax_values)
 elevation_sa<-terra::rast("C:/Users/franc/Documents/Master/APCE2024/QGIS/apce2024gis/2023_elevation/elevation_90m.tif")
 
 elevation_sa_map<-ggplot()+
   tidyterra::geom_spatraster(data=elevation_sa)+
   scale_fill_gradientn(colours=rev(terrain.colors(6)),
-                       limits=c(700,2300),
+                       limits=c(1400,2000),
                        oob=squish,#means that values outside the limits are set to the colour of the limits.
                        name="*meters")+
   tidyterra::geom_spatvector(data=protected_areas,
@@ -444,7 +483,7 @@ CoreProtectedAreas_map_sa
 
 
 ##################################################################################################
-allmaps_sa<-woody_map_sa+elevation_sa_map+rainfall_map_30_sa+soil_fertility_sa_map+dist_river_20_sa_map+hills_map_sa+rpoints_map_sa+CoreProtectedAreas_map_sa+burnfreq_map_sa+
+allmaps_sa<-woody_map_sa+elevation_sa_map+rainfall_map_30_sa+soil_fertility_sa_map+dist_river_170_sa_map+hills_map_sa+rpoints_map_sa+CoreProtectedAreas_map_sa+burnfreq_map_sa+
   patchwork::plot_layout(ncol=3)
 
 allmaps_sa
@@ -565,15 +604,3 @@ title(xlab=xlabel)
 title(ylab=ylabel)
 # add contours for woody cover
 vegan::ordisurf(pca_result, pointdata$woody, add = TRUE, col = "green4")
-
-
-
-
-
-
-
-
-
-# plot how woody cover is predicted by different variables
-
-
