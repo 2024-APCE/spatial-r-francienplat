@@ -124,6 +124,28 @@ rainfall_map<-ggplot()+
 
 rainfall_map
 
+rainfall_30m <- terra::resample(rainfall, rainfall_30m, method = "bilinear")  
+rainfall_map_30<-ggplot() +
+  tidyterra::geom_spatraster(data=rainfall) +
+  scale_fill_gradientn(colours=rev(pal_zissou1),
+                       limits=c(600,1200),
+                       oob=squish,
+                       name="mm/yr") +
+  tidyterra::geom_spatvector(data=protected_areas,
+                             fill=NA,linewidth=0.5) +
+  tidyterra::geom_spatvector(data=studyarea,
+                             fill=NA,linewidth=0.5,col="red") +
+  tidyterra::geom_spatvector(data=lakes,
+                             fill="lightblue",linewidth=0.5) +
+  tidyterra::geom_spatvector(data=rivers,
+                             col="blue",linewidth=0.5) +
+  labs(title="Rainfall") +
+  coord_sf(xlimits,ylimits,expand=F,
+           datum = sf::st_crs(32736)) +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank()) +
+  ggspatial::annotation_scale(location="bl",width_hint=0.2)
+rainfall_map_30 
 
 
 # plot the elevation map##########################################################################
