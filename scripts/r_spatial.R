@@ -39,7 +39,7 @@ barplot(rep(1,10), col = RColorBrewer::brewer.pal(10, "BrBG"))
 library(viridis) #another package with colour pallettes
 barplot(rep(1,10), col = rev(viridis::viridis(10)))
 barplot(rep(1,10), col = viridis::plasma(10))
-barplot(rep(1,10), col = viridis::heat(10))
+#barplot(rep(1,10), col = viridis::heat(10))
 viridis::plasma(10)
 
 library(wesanderson)
@@ -280,8 +280,8 @@ soil_fertility_sa_map<-ggplot()+
 soil_fertility_sa_map
 
 #elevation
-minmax_values <- terra::minmax(rainfall_sa)
-print(minmax_values)
+#minmax_values <- terra::minmax(rainfall_sa)
+#print(minmax_values)
 elevation_sa<-terra::rast("C:/Users/franc/Documents/Master/APCE2024/QGIS/apce2024gis/2023_elevation/elevation_90m.tif")
 
 elevation_sa_map<-ggplot()+
@@ -334,6 +334,7 @@ rainfall_sa_map
 # Define the extent and resolution for the new raster
 rainfall_30m <- rast(terra::ext(rainfall), resolution = 30, crs = crs(rainfall))
 # Resample the raster to 30m resolution
+
 rainfall_30m <- terra::resample(rainfall, rainfall_30m, method = "bilinear")  
 rainfall_sa<-terra::crop(rainfall_30m,saExt) # crop to study area
 rainfall_map_30_sa<-ggplot() +
@@ -546,6 +547,11 @@ pointdata<-cbind(dist2river_points[,2],elevation_points[,2],
   as_tibble()
 pointdata
 pointdata<-pointdata[complete.cases(pointdata),]#if some of your points exactly lay on the border
+readr::write_csv(pointdata,"pointdata.csv")
+complete.cases(pointdata)
+
+
+
 
 # plot how woody cover is predicted by different variables
 # Create a correlation panel plot
