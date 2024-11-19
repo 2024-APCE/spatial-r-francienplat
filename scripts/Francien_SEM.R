@@ -33,6 +33,8 @@ psych::pairs.panels(SEM_data%>% select(dist2river,elevation,rainfall,cec,burnfre
 psych::pairs.panels(SEM_data_std %>% select(dist2river,elevation,rainfall,cec,burnfreq,hills,woody),
                     stars = T, ellipses = F)
 
+#LUKTNIETggsave("./figures/pairs.panels",pairs.panels,width=18,height=18,units="cm",dpi=300)
+
 # analyse the model (response ~ predictors) with a multiple regression approach 
 multregwoody_std <- lm(woody ~ dist2river+ elevation + rainfall + hills + cec+burnfreq, data = SEM_data_std)
 summary(multregwoody_std)
@@ -47,6 +49,7 @@ Woody_model<-'woody~hills+elevation+dist2river+cec+burnfreq+rainfall
               rainfall~elevation+hills'
               
 Woody_model
+
 Woody_fit<-lavaan::sem(Woody_model, data=SEM_data_std)
 # show the model results
 summary(Woody_fit,standardized=TRUE,fit.measures=T,rsquare=T)
