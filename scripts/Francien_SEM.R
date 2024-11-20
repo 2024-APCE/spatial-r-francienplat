@@ -28,9 +28,9 @@ SEM_data_std
 # note that this does not affect the relations between the variables, only the scales  
 
 # make a pairs panel to inspect linearity of relations and expected normality of residuals
-psych::pairs.panels(SEM_data%>% select(dist2river,elevation,rainfall,cec,burnfreq,hills,woody),
+psych::pairs.panels(SEM_data%>% dplyr::select(dist2river,elevation,rainfall,cec,burnfreq,hills,woody),
                     stars = T, ellipses = F)
-psych::pairs.panels(SEM_data_std %>% select(dist2river,elevation,rainfall,cec,burnfreq,hills,woody),
+psych::pairs.panels(SEM_data_std %>% dplyr::select(dist2river,elevation,rainfall,cec,burnfreq,hills,woody),
                     stars = T, ellipses = F)
 
 #LUKTNIETggsave("./figures/pairs.panels",pairs.panels,width=18,height=18,units="cm",dpi=300)
@@ -40,17 +40,29 @@ multregwoody_std <- lm(woody ~ dist2river+ elevation + rainfall + hills + cec+bu
 summary(multregwoody_std)
 
 # Make a lavaan model as hypothesized in the Anderson et al 2007 paper and fit the model 
-Woody_model<-'woody~hills+elevation+dist2river+cec+burnfreq+rainfall
-              hills~elevation
-              elevation~hills
-              dist2river~elevation+hills
-              cec~rainfall+burnfreq
-              burnfreq~rainfall
-              rainfall~elevation+hills'
-              
-Woody_model
+#Woody_model<-'woody~burnfreq+cec+rainfall
+            #  burnfreq~rainfall
+             # cec~dist2river+burnfreq+hills
+             # hills~elevation
+              #rainfall~elevation
+              #dist2river~hills'
 
-Woody_fit<-lavaan::sem(Woody_model, data=SEM_data_std)
+#Woody_model
+
+Woody_model2<-'woody~rainfall+dist2river+hills+burnfreq
+              burnfreq~rainfall+dist2river
+              hills~~elevation
+              rainfall~hills+elevation
+              dist2river~hills+elevation'
+
+#install.packages("lavaanPlot")
+library(lavaanPlot)
+lavaanPlot(model=Woody_fit,
+           coefs=TRUE,
+           stand=TRUE,
+           graph_options=list(rankdir="LR"),
+           stars= "regress")
+Woody_fit<-lavaan::sem(Woody_model2, data=SEM_data_std)
 # show the model results
 summary(Woody_fit,standardized=TRUE,fit.measures=T,rsquare=T)
 # goodness of fit (should be >0.9): CFI and TLI
